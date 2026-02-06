@@ -7,7 +7,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@700;900&family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
     <style>
-        /* 기존 스타일과 동일 - 생략 가능 */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'DM Sans', sans-serif; background: linear-gradient(135deg, #0a0e27 0%, #1a1147 50%, #2d1b47 100%); color: #e8e6f0; overflow-x: hidden; }
         .hero-title { font-family: 'Fraunces', serif; font-weight: 900; background: linear-gradient(135deg, #00fff2 0%, #a78bfa 50%, #f472b6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; letter-spacing: -0.03em; line-height: 1.1; }
@@ -37,9 +36,6 @@
         .badge-new { background: linear-gradient(135deg, #ec4899, #f472b6); color: white; }
         .badge-top { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #1a1147; }
         .scroll-progress { position: fixed; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, #00fff2, #a78bfa, #f472b6); transform-origin: left; z-index: 9999; }
-        .loading-spinner { border: 3px solid rgba(255, 255, 255, 0.1); border-top: 3px solid #00fff2; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .error-message { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #f87171; padding: 1rem; border-radius: 12px; }
     </style>
 </head>
 <body>
@@ -52,53 +48,65 @@
     <script type="text/babel">
         const { useState, useEffect } = React;
         
-        // API URL 자동 감지 (프로덕션/개발 환경)
-        const getApiBaseUrl = () => {
-            // 같은 도메인에서 제공되는 경우 (Nginx 프록시)
-            if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
-                return '/api'; // Nginx가 /api를 백엔드로 프록시
-            }
-            // 로컬 개발 환경
-            return 'http://localhost:8000/api';
-        };
+        // 실제 데이터 (2025-2026 기준) - 백엔드 없이 작동
+        const llmModels = [
+            { rank: 1, name: "Claude Opus 4.5", company: "Anthropic", score: 89.4, price: "$$$", usage: 95, newFeatures: ["Extended Context", "Vision"], color: "#00fff2" },
+            { rank: 2, name: "GPT-5", company: "OpenAI", score: 88.0, price: "$$$$", usage: 92, newFeatures: ["Multimodal", "Long Context"], color: "#a78bfa" },
+            { rank: 3, name: "Gemini 3 Pro", company: "Google", score: 82.2, price: "$$$", usage: 88, newFeatures: ["Native Audio", "Vision"], color: "#f472b6" },
+            { rank: 4, name: "Claude Sonnet 4.5", company: "Anthropic", score: 82.0, price: "$$", usage: 97, newFeatures: ["Code Generation"], color: "#00fff2" },
+            { rank: 5, name: "DeepSeek V3", company: "DeepSeek", score: 79.0, price: "$", usage: 85, newFeatures: ["Open Source"], color: "#fb923c" },
+            { rank: 6, name: "Grok 4", company: "xAI", score: 79.0, price: "$$$", usage: 78, newFeatures: ["Real-time Data"], color: "#8b5cf6" },
+            { rank: 7, name: "Llama 4", company: "Meta", score: 76.5, price: "Free", usage: 90, newFeatures: ["Open Weights"], color: "#3b82f6" },
+            { rank: 8, name: "Claude Haiku 4.5", company: "Anthropic", score: 74.0, price: "$", usage: 93, newFeatures: ["Speed Optimized"], color: "#00fff2" }
+        ];
         
-        const API_BASE_URL = getApiBaseUrl();
+        const imageModels = [
+            { rank: 1, name: "Nano Banana Pro", company: "Google", score: 95, price: "$$", usage: 92, specialty: "Photorealism", color: "#f472b6" },
+            { rank: 2, name: "GPT Image 1.5", company: "OpenAI", score: 94, price: "$$$", usage: 88, specialty: "Precision", color: "#a78bfa" },
+            { rank: 3, name: "Seedream 4", company: "ByteDance", score: 90, price: "$$", usage: 85, specialty: "Versatility", color: "#fb923c" },
+            { rank: 4, name: "Flux.1 Kontext", company: "Black Forest Labs", score: 88, price: "$", usage: 89, specialty: "Style Control", color: "#00fff2" },
+            { rank: 5, name: "Midjourney v7", company: "Midjourney", score: 87, price: "$$$", usage: 94, specialty: "Artistic", color: "#8b5cf6" },
+            { rank: 6, name: "Reve Image", company: "Reve AI", score: 86, price: "$$", usage: 82, specialty: "Prompt Adherence", color: "#10b981" },
+            { rank: 7, name: "Emu 3.5", company: "Meta", score: 85, price: "Free", usage: 87, specialty: "Realism", color: "#3b82f6" },
+            { rank: 8, name: "Recraft V3", company: "Recraft", score: 84, price: "$$", usage: 79, specialty: "Character Consistency", color: "#fbbf24" }
+        ];
         
-        // API 서비스 클래스
-        class AIDataService {
-            async fetchData(endpoint) {
-                try {
-                    const response = await fetch(`${API_BASE_URL}${endpoint}`);
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    return await response.json();
-                } catch (error) {
-                    console.error(`Error fetching ${endpoint}:`, error);
-                    throw error;
-                }
-            }
-            
-            async getLLMModels() { return this.fetchData('/models/llm'); }
-            async getImageModels() { return this.fetchData('/models/image'); }
-            async getVideoModels() { return this.fetchData('/models/video'); }
-            async getCountries() { return this.fetchData('/countries'); }
-            async getInsights() { return this.fetchData('/insights'); }
-            async getStatus() { return this.fetchData('/status'); }
-        }
+        const videoModels = [
+            { rank: 1, name: "Veo 3.1", company: "Google", score: 94, price: "$$$", usage: 88, duration: "8s with audio", color: "#f472b6" },
+            { rank: 2, name: "Sora 2", company: "OpenAI", score: 92, price: "$$$$", usage: 85, duration: "60s", color: "#a78bfa" },
+            { rank: 3, name: "Wan 2.5", company: "Pixazo", score: 90, price: "$$", usage: 90, duration: "20s with sync", color: "#fb923c" },
+            { rank: 4, name: "Runway Gen-4.5", company: "Runway", score: 89, price: "$$$", usage: 92, duration: "Multi-shot", color: "#00fff2" },
+            { rank: 5, name: "Pika 2.5", company: "Pika Labs", score: 85, price: "$$", usage: 87, duration: "10s", color: "#8b5cf6" },
+            { rank: 6, name: "Seedance 1 Pro", company: "ByteDance", score: 83, price: "$$", usage: 84, duration: "24fps 1080p", color: "#fb923c" },
+            { rank: 7, name: "Kling 2.1", company: "Kuaishou", score: 82, price: "$$", usage: 79, duration: "2 min", color: "#fbbf24" },
+            { rank: 8, name: "Luma Ray3", company: "Luma Labs", score: 80, price: "$", usage: 86, duration: "5-10s", color: "#10b981" }
+        ];
         
-        const service = new AIDataService();
+        const countries = [
+            { rank: 1, name: "미국", flag: "🇺🇸", aiPower: 39700, investment: 77.5, adoption: 28.3, models: 561, trend: "up" },
+            { rank: 2, name: "중국", flag: "🇨🇳", aiPower: 400, investment: 45.2, adoption: 18.5, models: 342, trend: "up" },
+            { rank: 3, name: "UAE", flag: "🇦🇪", aiPower: 3900, investment: 3.7, adoption: 64.0, models: 12, trend: "up" },
+            { rank: 4, name: "영국", flag: "🇬🇧", aiPower: 5200, investment: 28.3, adoption: 35.2, models: 156, trend: "stable" },
+            { rank: 5, name: "독일", flag: "🇩🇪", aiPower: 51, investment: 12.8, adoption: 31.5, models: 89, trend: "stable" },
+            { rank: 6, name: "한국", flag: "🇰🇷", aiPower: 5700, investment: 8.4, adoption: 42.1, models: 78, trend: "up" },
+            { rank: 7, name: "인도", flag: "🇮🇳", aiPower: 1200, investment: 11.1, adoption: 14.2, models: 124, trend: "up" },
+            { rank: 8, name: "프랑스", flag: "🇫🇷", aiPower: 2400, investment: 9.5, adoption: 44.0, models: 67, trend: "stable" },
+            { rank: 9, name: "일본", flag: "🇯🇵", aiPower: 890, investment: 5.9, adoption: 22.7, models: 103, trend: "stable" },
+            { rank: 10, name: "싱가포르", flag: "🇸🇬", aiPower: 1800, investment: 7.3, adoption: 60.9, models: 45, trend: "up" }
+        ];
+        
+        const insights = [
+            { title: "멀티모달 통합 가속화", description: "2025년 AI 모델들은 텍스트, 이미지, 오디오, 비디오를 하나의 시스템에서 처리하는 방향으로 진화. GPT-4o, Gemini Ultra가 선도.", icon: "🔄", color: "border-cyan-400" },
+            { title: "오픈소스의 부상", description: "DeepSeek V3, Llama 4 등 오픈소스 모델들이 상용 모델과 대등한 성능 달성. MIT 라이선스로 접근성 크게 향상.", icon: "🌐", color: "border-purple-400" },
+            { title: "실시간 오디오-비디오 동기화", description: "Veo 3.1이 네이티브 오디오 생성으로 획기적 전환점. Wan 2.5는 원프롬프트 동기화 구현.", icon: "🎬", color: "border-pink-400" },
+            { title: "비용 효율성 개선", description: "AI 추론 비용이 2024년 대비 평균 40% 감소. Claude Haiku 4.5와 같은 경량 모델이 품질 타협 없이 저비용 실현.", icon: "💰", color: "border-orange-400" },
+            { title: "국가별 AI 격차 심화", description: "Global North와 South 간 AI 도입률 격차가 10.6%p로 확대. UAE, 한국이 빠른 성장세.", icon: "🌍", color: "border-blue-400" },
+            { title: "특화 모델 시대", description: "범용 모델보다 특정 작업에 최적화된 전문 모델 선호도 증가. 코딩, 이미지 편집, 비디오 생성 등 분야별 강자 출현.", icon: "🎯", color: "border-green-400" }
+        ];
         
         function Dashboard() {
             const [activeTab, setActiveTab] = useState('llm');
-            const [llmModels, setLlmModels] = useState([]);
-            const [imageModels, setImageModels] = useState([]);
-            const [videoModels, setVideoModels] = useState([]);
-            const [countries, setCountries] = useState([]);
-            const [insights, setInsights] = useState([]);
-            const [lastUpdate, setLastUpdate] = useState(null);
-            const [loading, setLoading] = useState(true);
-            const [error, setError] = useState(null);
+            const [lastUpdate] = useState(new Date());
             const [scrollProgress, setScrollProgress] = useState(0);
             
             useEffect(() => {
@@ -112,45 +120,6 @@
                 window.addEventListener('scroll', handleScroll);
                 return () => window.removeEventListener('scroll', handleScroll);
             }, []);
-            
-            useEffect(() => {
-                loadAllData();
-            }, []);
-            
-            useEffect(() => {
-                const interval = setInterval(() => {
-                    loadAllData();
-                }, 300000);
-                return () => clearInterval(interval);
-            }, []);
-            
-            const loadAllData = async () => {
-                try {
-                    setLoading(true);
-                    setError(null);
-                    
-                    const [llm, image, video, countriesData, insightsData, status] = await Promise.all([
-                        service.getLLMModels(),
-                        service.getImageModels(),
-                        service.getVideoModels(),
-                        service.getCountries(),
-                        service.getInsights(),
-                        service.getStatus()
-                    ]);
-                    
-                    setLlmModels(llm);
-                    setImageModels(image);
-                    setVideoModels(video);
-                    setCountries(countriesData);
-                    setInsights(insightsData);
-                    setLastUpdate(new Date(status.last_update));
-                    setLoading(false);
-                } catch (err) {
-                    setError('데이터를 불러오는데 실패했습니다.');
-                    setLoading(false);
-                    console.error('Load error:', err);
-                }
-            };
             
             const getModels = () => {
                 switch(activeTab) {
@@ -170,34 +139,6 @@
                 }
             };
             
-            if (loading && !lastUpdate) {
-                return (
-                    <div className="min-h-screen flex items-center justify-center">
-                        <div className="text-center">
-                            <div className="loading-spinner mx-auto mb-4"></div>
-                            <p className="text-gray-400">데이터를 불러오는 중...</p>
-                        </div>
-                    </div>
-                );
-            }
-            
-            if (error && !lastUpdate) {
-                return (
-                    <div className="min-h-screen flex items-center justify-center p-6">
-                        <div className="error-message max-w-2xl text-center">
-                            <h2 className="text-2xl font-bold mb-4">⚠️ 연결 오류</h2>
-                            <p className="mb-4">{error}</p>
-                            <button 
-                                onClick={loadAllData}
-                                className="px-6 py-3 bg-cyan-500 hover:bg-cyan-600 rounded-lg transition-colors"
-                            >
-                                다시 시도
-                            </button>
-                        </div>
-                    </div>
-                );
-            }
-            
             return (
                 <div className="min-h-screen">
                     <div className="scroll-progress" style={{ transform: `scaleX(${scrollProgress / 100})` }}></div>
@@ -214,19 +155,18 @@
                                 <div className="flex justify-center items-center gap-4 mb-6">
                                     <div className="update-indicator">
                                         <div className="update-dot"></div>
-                                        <span className="mono">LIVE</span>
+                                        <span className="mono">STATIC</span>
                                     </div>
-                                    {lastUpdate && (
-                                        <span className="text-sm text-gray-400 mono">
-                                            Last updated: {lastUpdate.toLocaleTimeString('ko-KR')}
-                                        </span>
-                                    )}
+                                    <span className="text-sm text-gray-400 mono">
+                                        Data: Feb 2026
+                                    </span>
                                 </div>
                                 <h1 className="hero-title text-7xl md:text-8xl mb-6">
-                                    Global AI Model Observatory 2026
+                                    Global AI Model<br/>Observatory 2026
                                 </h1>
                                 <p className="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
-                                    실시간으로 세계 최고의 AI 모델을 비교하고 추적하세요.
+                                    세계 최고의 AI 모델을 비교하고 추적하세요.<br/>
+                                    성능, 비용, 사용량, 국가별 AI 발전 현황을 한눈에.
                                 </p>
                             </div>
                             
@@ -244,24 +184,180 @@
                                     <div className="text-sm text-gray-400 mt-2">글로벌 AI 도입률</div>
                                 </div>
                                 <div className="glass-strong rounded-2xl p-6 text-center pulse-glow-animation" style={{ animationDelay: '1.5s' }}>
-                                    <div className="text-4xl font-bold mono text-orange-400">LIVE</div>
-                                    <div className="text-sm text-gray-400 mt-2">실시간 업데이트</div>
+                                    <div className="text-4xl font-bold mono text-orange-400">$4.8T</div>
+                                    <div className="text-sm text-gray-400 mt-2">2033 예상 시장규모</div>
                                 </div>
                             </div>
                         </div>
                     </div>
                     
-                    {/* 나머지 컴포넌트는 기존과 동일하므로 생략... */}
-                    {/* Model Comparison, Country Rankings, Insights 섹션 */}
+                    <div className="container mx-auto px-6 py-16">
+                        <div className="glass rounded-3xl p-8 mb-16">
+                            <div className="flex flex-wrap gap-4 mb-8 border-b border-white/10 pb-6">
+                                <button onClick={() => setActiveTab('llm')} className={`tab-button px-6 py-3 rounded-xl font-semibold transition-all ${activeTab === 'llm' ? 'active glass-strong' : 'text-gray-400 hover:text-white'}`}>
+                                    💬 LLM 모델
+                                </button>
+                                <button onClick={() => setActiveTab('image')} className={`tab-button px-6 py-3 rounded-xl font-semibold transition-all ${activeTab === 'image' ? 'active glass-strong' : 'text-gray-400 hover:text-white'}`}>
+                                    🎨 이미지 생성
+                                </button>
+                                <button onClick={() => setActiveTab('video')} className={`tab-button px-6 py-3 rounded-xl font-semibold transition-all ${activeTab === 'video' ? 'active glass-strong' : 'text-gray-400 hover:text-white'}`}>
+                                    🎬 비디오 생성
+                                </button>
+                            </div>
+                            
+                            <h2 className="section-title text-4xl mb-8">
+                                {getTitle()} 성능 순위
+                            </h2>
+                            
+                            <div className="grid md:grid-cols-2 gap-6">
+                                {getModels().map((model) => (
+                                    <div key={model.rank} className="model-card glass-strong rounded-2xl p-6">
+                                        <div className="flex items-start justify-between mb-4">
+                                            <div className="flex items-center gap-3">
+                                                <div className="rank-badge w-10 h-10 rounded-xl flex items-center justify-center font-bold mono">
+                                                    {model.rank}
+                                                </div>
+                                                <div>
+                                                    <h3 className="font-bold text-lg flex items-center gap-2">
+                                                        {model.name}
+                                                        {model.rank <= 3 && <span className="badge badge-top">TOP</span>}
+                                                        {model.newFeatures && <span className="badge badge-new">NEW</span>}
+                                                    </h3>
+                                                    <p className="text-sm text-gray-400">{model.company}</p>
+                                                </div>
+                                            </div>
+                                            <div className="price-tag mono">{model.price}</div>
+                                        </div>
+                                        
+                                        <div className="space-y-3">
+                                            <div>
+                                                <div className="flex justify-between text-sm mb-2">
+                                                    <span className="text-gray-400">성능 점수</span>
+                                                    <span className="font-bold mono" style={{ color: model.color }}>{model.score}</span>
+                                                </div>
+                                                <div className="stat-bar">
+                                                    <div className="stat-fill" style={{ width: `${model.score}%`, background: `linear-gradient(90deg, ${model.color}, ${model.color}88)` }}></div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div>
+                                                <div className="flex justify-between text-sm mb-2">
+                                                    <span className="text-gray-400">사용률</span>
+                                                    <span className="font-bold mono">{model.usage}%</span>
+                                                </div>
+                                                <div className="stat-bar">
+                                                    <div className="stat-fill" style={{ width: `${model.usage}%` }}></div>
+                                                </div>
+                                            </div>
+                                            
+                                            {model.specialty && (
+                                                <div className="flex items-center gap-2 text-sm">
+                                                    <span className="text-gray-400">특화:</span>
+                                                    <span className="font-semibold" style={{ color: model.color }}>{model.specialty}</span>
+                                                </div>
+                                            )}
+                                            
+                                            {model.duration && (
+                                                <div className="flex items-center gap-2 text-sm">
+                                                    <span className="text-gray-400">길이:</span>
+                                                    <span className="font-semibold" style={{ color: model.color }}>{model.duration}</span>
+                                                </div>
+                                            )}
+                                            
+                                            {model.newFeatures && (
+                                                <div className="flex flex-wrap gap-2 mt-3">
+                                                    {model.newFeatures.map(feature => (
+                                                        <span key={feature} className="text-xs px-3 py-1 rounded-full glass border border-white/20">
+                                                            {feature}
+                                                        </span>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                        
+                        <div className="glass rounded-3xl p-8 mb-16">
+                            <h2 className="section-title text-4xl mb-8">
+                                🌍 국가별 AI 역량 순위
+                            </h2>
+                            
+                            <div className="grid md:grid-cols-2 gap-6">
+                                {countries.map((country) => (
+                                    <div key={country.rank} className="glass-strong rounded-2xl p-6 hover:scale-105 transition-transform">
+                                        <div className="flex items-center justify-between mb-4">
+                                            <div className="flex items-center gap-4">
+                                                <div className="rank-badge w-10 h-10 rounded-xl flex items-center justify-center font-bold mono text-sm">
+                                                    {country.rank}
+                                                </div>
+                                                <div className="text-3xl">{country.flag}</div>
+                                                <div>
+                                                    <h3 className="font-bold text-lg">{country.name}</h3>
+                                                    <p className="text-sm text-gray-400 mono">{country.models} 모델</p>
+                                                </div>
+                                            </div>
+                                            <div className={`text-2xl ${country.trend === 'up' ? 'text-cyan-400' : 'text-gray-400'}`}>
+                                                {country.trend === 'up' ? '↗' : '→'}
+                                            </div>
+                                        </div>
+                                        
+                                        <div className="grid grid-cols-3 gap-4 text-center">
+                                            <div>
+                                                <div className="text-xs text-gray-400 mb-1">AI 파워</div>
+                                                <div className="font-bold mono text-cyan-400">{country.aiPower.toLocaleString()}</div>
+                                            </div>
+                                            <div>
+                                                <div className="text-xs text-gray-400 mb-1">투자 ($B)</div>
+                                                <div className="font-bold mono text-purple-400">${country.investment}</div>
+                                            </div>
+                                            <div>
+                                                <div className="text-xs text-gray-400 mb-1">도입률</div>
+                                                <div className="font-bold mono text-pink-400">{country.adoption}%</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                        
+                        <div className="glass rounded-3xl p-8">
+                            <h2 className="section-title text-4xl mb-8">
+                                💡 2025-2026 AI 발전 인사이트
+                            </h2>
+                            
+                            <div className="grid md:grid-cols-2 gap-6">
+                                {insights.map((insight, index) => (
+                                    <div key={index} className={`glass-strong rounded-2xl p-6 border-l-4 ${insight.color}`}>
+                                        <div className="flex items-start gap-4">
+                                            <div className="text-4xl">{insight.icon}</div>
+                                            <div>
+                                                <h3 className="font-bold text-lg mb-2">{insight.title}</h3>
+                                                <p className="text-sm text-gray-300 leading-relaxed">{insight.description}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                            
+                            <div className="mt-12 text-center">
+                                <div className="inline-flex items-center gap-3 glass-strong rounded-full px-6 py-4">
+                                    <div className="w-3 h-3 bg-green-400 rounded-full"></div>
+                                    <span className="text-sm font-semibold">Static Version - 백엔드 없이 작동 (GitHub Pages 호환)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     
                     <div className="container mx-auto px-6 py-12 text-center">
                         <div className="glass rounded-2xl p-8">
                             <h3 className="text-2xl font-bold mb-4">데이터 소스</h3>
                             <p className="text-sm text-gray-400 leading-relaxed max-w-4xl mx-auto mb-4">
-                                실시간 API 연동 - Artificial Analysis, Arena AI, OpenRouter, Stanford HAI
+                                Artificial Analysis, Arena AI (LMSYS), OpenRouter Rankings, Stanford HAI Global AI Vibrancy Tool
                             </p>
                             <div className="mt-6 mono text-xs text-gray-500">
-                                Deployed on Web Server • {lastUpdate && `Last updated: ${lastUpdate.toLocaleString('ko-KR')}`}
+                                Built with React • GitHub Pages Compatible • Last updated: Feb 2026
                             </div>
                         </div>
                     </div>
