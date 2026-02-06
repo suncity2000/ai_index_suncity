@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  # 백엔드 API 서버
+  backend:
+    build: .
+    container_name: ai-observatory-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONUNBUFFERED=1
+      - LOG_LEVEL=info
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/status"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - ai-observatory-network
+
+  # Nginx 웹서버 (프론트엔드 제공)
+  nginx:
+    image: nginx:alpine
+    container_name: ai-observatory-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./frontend-api-connected.html:/usr/share/nginx/html/index.html:ro
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - ai-observatory-network
+
+  # Redis 캐시 (선택사항 - 성능 향상)
+  redis:
+    image: redis:7-alpine
+    container_name: ai-observatory-redis
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - redis-data:/data
+    restart: unless-stopped
+    networks:
+      - ai-observatory-network
+
+networks:
+  ai-observatory-network:
+    driver: bridge
+
+volumes:
+  redis-data:

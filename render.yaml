@@ -1,0 +1,40 @@
+services:
+  # 백엔드 API 서버
+  - type: web
+    name: ai-observatory-backend
+    env: python
+    region: oregon
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python backend_api.py
+    healthCheckPath: /api/status
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: PORT
+        value: 8000
+    # 자동 배포 설정
+    autoDeploy: true
+    
+  # 프론트엔드 정적 사이트
+  - type: web
+    name: ai-observatory-frontend
+    env: static
+    region: oregon
+    plan: free
+    buildCommand: echo "Static files ready"
+    staticPublishPath: .
+    # API 프록시 설정
+    routes:
+      - type: rewrite
+        source: /api/*
+        destination: https://ai-observatory-backend.onrender.com/api/*
+    headers:
+      - path: /*
+        name: Cache-Control
+        value: public, max-age=0, must-revalidate
+      - path: /*
+        name: Access-Control-Allow-Origin
+        value: "*"
+    # 자동 배포 설정
+    autoDeploy: true
