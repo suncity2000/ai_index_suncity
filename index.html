@@ -35,7 +35,10 @@
         .badge { padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
         .badge-new { background: linear-gradient(135deg, #ec4899, #f472b6); color: white; }
         .badge-top { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #1a1147; }
+        .badge-kr { background: linear-gradient(135deg, #3b82f6, #60a5fa); color: white; border: 2px solid #93c5fd; }
         .scroll-progress { position: fixed; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, #00fff2, #a78bfa, #f472b6); transform-origin: left; z-index: 9999; }
+        .link-button { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; background: rgba(0, 255, 242, 0.1); border: 1px solid rgba(0, 255, 242, 0.3); border-radius: 8px; font-size: 12px; color: #00fff2; text-decoration: none; transition: all 0.3s ease; }
+        .link-button:hover { background: rgba(0, 255, 242, 0.2); transform: scale(1.05); box-shadow: 0 0 20px rgba(0, 255, 242, 0.3); }
     </style>
 </head>
 <body>
@@ -48,40 +51,67 @@
     <script type="text/babel">
         const { useState, useEffect } = React;
         
-        // 실제 데이터 (2025-2026 기준) - 백엔드 없이 작동
+        // LLM 모델 데이터
         const llmModels = [
-            { rank: 1, name: "Claude Opus 4.5", company: "Anthropic", score: 89.4, price: "$$$", usage: 95, newFeatures: ["Extended Context", "Vision"], color: "#00fff2" },
-            { rank: 2, name: "GPT-5", company: "OpenAI", score: 88.0, price: "$$$$", usage: 92, newFeatures: ["Multimodal", "Long Context"], color: "#a78bfa" },
-            { rank: 3, name: "Gemini 3 Pro", company: "Google", score: 82.2, price: "$$$", usage: 88, newFeatures: ["Native Audio", "Vision"], color: "#f472b6" },
-            { rank: 4, name: "Claude Sonnet 4.5", company: "Anthropic", score: 82.0, price: "$$", usage: 97, newFeatures: ["Code Generation"], color: "#00fff2" },
-            { rank: 5, name: "DeepSeek V3", company: "DeepSeek", score: 79.0, price: "$", usage: 85, newFeatures: ["Open Source"], color: "#fb923c" },
-            { rank: 6, name: "Grok 4", company: "xAI", score: 79.0, price: "$$$", usage: 78, newFeatures: ["Real-time Data"], color: "#8b5cf6" },
-            { rank: 7, name: "Llama 4", company: "Meta", score: 76.5, price: "Free", usage: 90, newFeatures: ["Open Weights"], color: "#3b82f6" },
-            { rank: 8, name: "Claude Haiku 4.5", company: "Anthropic", score: 74.0, price: "$", usage: 93, newFeatures: ["Speed Optimized"], color: "#00fff2" }
+            { rank: 1, name: "Claude Opus 4.5", company: "Anthropic", score: 89.4, price: "$$$", usage: 95, newFeatures: ["Extended Context", "Vision"], color: "#00fff2", url: "https://claude.ai", isKorean: false },
+            { rank: 2, name: "GPT-5", company: "OpenAI", score: 88.0, price: "$$$$", usage: 92, newFeatures: ["Multimodal", "Long Context"], color: "#a78bfa", url: "https://openai.com/gpt-5", isKorean: false },
+            { rank: 3, name: "Gemini 3 Pro", company: "Google", score: 82.2, price: "$$$", usage: 88, newFeatures: ["Native Audio", "Vision"], color: "#f472b6", url: "https://gemini.google.com", isKorean: false },
+            { rank: 4, name: "Claude Sonnet 4.5", company: "Anthropic", score: 82.0, price: "$$", usage: 97, newFeatures: ["Code Generation"], color: "#00fff2", url: "https://claude.ai", isKorean: false },
+            { rank: 5, name: "DeepSeek V3", company: "DeepSeek", score: 79.0, price: "$", usage: 85, newFeatures: ["Open Source"], color: "#fb923c", url: "https://chat.deepseek.com", isKorean: false },
+            { rank: 6, name: "Grok 4", company: "xAI", score: 79.0, price: "$$$", usage: 78, newFeatures: ["Real-time Data"], color: "#8b5cf6", url: "https://x.ai", isKorean: false },
+            { rank: 7, name: "Llama 4", company: "Meta", score: 76.5, price: "Free", usage: 90, newFeatures: ["Open Weights"], color: "#3b82f6", url: "https://llama.meta.com", isKorean: false },
+            { rank: 8, name: "Claude Haiku 4.5", company: "Anthropic", score: 74.0, price: "$", usage: 93, newFeatures: ["Speed Optimized"], color: "#00fff2", url: "https://claude.ai", isKorean: false }
         ];
         
+        // 이미지 생성 모델 데이터
         const imageModels = [
-            { rank: 1, name: "Nano Banana Pro", company: "Google", score: 95, price: "$$", usage: 92, specialty: "Photorealism", color: "#f472b6" },
-            { rank: 2, name: "GPT Image 1.5", company: "OpenAI", score: 94, price: "$$$", usage: 88, specialty: "Precision", color: "#a78bfa" },
-            { rank: 3, name: "Seedream 4", company: "ByteDance", score: 90, price: "$$", usage: 85, specialty: "Versatility", color: "#fb923c" },
-            { rank: 4, name: "Flux.1 Kontext", company: "Black Forest Labs", score: 88, price: "$", usage: 89, specialty: "Style Control", color: "#00fff2" },
-            { rank: 5, name: "Midjourney v7", company: "Midjourney", score: 87, price: "$$$", usage: 94, specialty: "Artistic", color: "#8b5cf6" },
-            { rank: 6, name: "Reve Image", company: "Reve AI", score: 86, price: "$$", usage: 82, specialty: "Prompt Adherence", color: "#10b981" },
-            { rank: 7, name: "Emu 3.5", company: "Meta", score: 85, price: "Free", usage: 87, specialty: "Realism", color: "#3b82f6" },
-            { rank: 8, name: "Recraft V3", company: "Recraft", score: 84, price: "$$", usage: 79, specialty: "Character Consistency", color: "#fbbf24" }
+            { rank: 1, name: "Nano Banana Pro", company: "Google", score: 95, price: "$$", usage: 92, specialty: "Photorealism", color: "#f472b6", url: "https://labs.google/nano", isKorean: false },
+            { rank: 2, name: "GPT Image 1.5", company: "OpenAI", score: 94, price: "$$$", usage: 88, specialty: "Precision", color: "#a78bfa", url: "https://openai.com/dall-e", isKorean: false },
+            { rank: 3, name: "Seedream 4", company: "ByteDance", score: 90, price: "$$", usage: 85, specialty: "Versatility", color: "#fb923c", url: "https://seedream.ai", isKorean: false },
+            { rank: 4, name: "Flux.1 Kontext", company: "Black Forest Labs", score: 88, price: "$", usage: 89, specialty: "Style Control", color: "#00fff2", url: "https://blackforestlabs.ai", isKorean: false },
+            { rank: 5, name: "Midjourney v7", company: "Midjourney", score: 87, price: "$$$", usage: 94, specialty: "Artistic", color: "#8b5cf6", url: "https://midjourney.com", isKorean: false },
+            { rank: 6, name: "Reve Image", company: "Reve AI", score: 86, price: "$$", usage: 82, specialty: "Prompt Adherence", color: "#10b981", url: "https://reve.ai", isKorean: false },
+            { rank: 7, name: "Emu 3.5", company: "Meta", score: 85, price: "Free", usage: 87, specialty: "Realism", color: "#3b82f6", url: "https://ai.meta.com/emu", isKorean: false },
+            { rank: 8, name: "Recraft V3", company: "Recraft", score: 84, price: "$$", usage: 79, specialty: "Character Consistency", color: "#fbbf24", url: "https://recraft.ai", isKorean: false }
         ];
         
+        // 비디오 생성 모델 데이터
         const videoModels = [
-            { rank: 1, name: "Veo 3.1", company: "Google", score: 94, price: "$$$", usage: 88, duration: "8s with audio", color: "#f472b6" },
-            { rank: 2, name: "Sora 2", company: "OpenAI", score: 92, price: "$$$$", usage: 85, duration: "60s", color: "#a78bfa" },
-            { rank: 3, name: "Wan 2.5", company: "Pixazo", score: 90, price: "$$", usage: 90, duration: "20s with sync", color: "#fb923c" },
-            { rank: 4, name: "Runway Gen-4.5", company: "Runway", score: 89, price: "$$$", usage: 92, duration: "Multi-shot", color: "#00fff2" },
-            { rank: 5, name: "Pika 2.5", company: "Pika Labs", score: 85, price: "$$", usage: 87, duration: "10s", color: "#8b5cf6" },
-            { rank: 6, name: "Seedance 1 Pro", company: "ByteDance", score: 83, price: "$$", usage: 84, duration: "24fps 1080p", color: "#fb923c" },
-            { rank: 7, name: "Kling 2.1", company: "Kuaishou", score: 82, price: "$$", usage: 79, duration: "2 min", color: "#fbbf24" },
-            { rank: 8, name: "Luma Ray3", company: "Luma Labs", score: 80, price: "$", usage: 86, duration: "5-10s", color: "#10b981" }
+            { rank: 1, name: "Veo 3.1", company: "Google", score: 94, price: "$$$", usage: 88, duration: "8s with audio", color: "#f472b6", url: "https://deepmind.google/technologies/veo/", isKorean: false },
+            { rank: 2, name: "Sora 2", company: "OpenAI", score: 92, price: "$$$$", usage: 85, duration: "60s", color: "#a78bfa", url: "https://openai.com/sora", isKorean: false },
+            { rank: 3, name: "Wan 2.5", company: "Pixazo", score: 90, price: "$$", usage: 90, duration: "20s with sync", color: "#fb923c", url: "https://pixazo.ai/wan", isKorean: false },
+            { rank: 4, name: "Runway Gen-4.5", company: "Runway", score: 89, price: "$$$", usage: 92, duration: "Multi-shot", color: "#00fff2", url: "https://runwayml.com", isKorean: false },
+            { rank: 5, name: "Pika 2.5", company: "Pika Labs", score: 85, price: "$$", usage: 87, duration: "10s", color: "#8b5cf6", url: "https://pika.art", isKorean: false },
+            { rank: 6, name: "Seedance 1 Pro", company: "ByteDance", score: 83, price: "$$", usage: 84, duration: "24fps 1080p", color: "#fb923c", url: "https://seedance.bytedance.com", isKorean: false },
+            { rank: 7, name: "Kling 2.1", company: "Kuaishou", score: 82, price: "$$", usage: 79, duration: "2 min", color: "#fbbf24", url: "https://klingai.com", isKorean: false },
+            { rank: 8, name: "Luma Ray3", company: "Luma Labs", score: 80, price: "$", usage: 86, duration: "5-10s", color: "#10b981", url: "https://lumalabs.ai", isKorean: false }
         ];
         
+        // 음성/TTS 모델 데이터 (새로 추가)
+        const voiceModels = [
+            { rank: 1, name: "ElevenLabs Turbo v3", company: "ElevenLabs", score: 96, price: "$$", usage: 94, specialty: "자연스러운 억양", color: "#a78bfa", url: "https://elevenlabs.io", isKorean: false },
+            { rank: 2, name: "OpenAI Voice Engine", company: "OpenAI", score: 94, price: "$$$", usage: 89, specialty: "클론 정확도", color: "#00fff2", url: "https://openai.com/voice-engine", isKorean: false },
+            { rank: 3, name: "Clova Dubbing", company: "Naver", score: 91, price: "$$", usage: 78, specialty: "한국어 특화", color: "#10b981", url: "https://clovadubbing.naver.com", isKorean: true },
+            { rank: 4, name: "Google Chirp 2", company: "Google", score: 90, price: "$$", usage: 85, specialty: "다국어 지원", color: "#f472b6", url: "https://cloud.google.com/text-to-speech", isKorean: false },
+            { rank: 5, name: "Typecast 2.0", company: "Neosapience", score: 88, price: "$", usage: 72, specialty: "감정 표현", color: "#fb923c", url: "https://typecast.ai", isKorean: true },
+            { rank: 6, name: "Resemble AI Ultra", company: "Resemble AI", score: 87, price: "$$", usage: 80, specialty: "실시간 생성", color: "#8b5cf6", url: "https://resemble.ai", isKorean: false },
+            { rank: 7, name: "Murf Studio Pro", company: "Murf AI", score: 85, price: "$", usage: 88, specialty: "비디오 싱크", color: "#3b82f6", url: "https://murf.ai", isKorean: false },
+            { rank: 8, name: "VREW Voice", company: "Voyagerx", score: 84, price: "Free", usage: 92, specialty: "무료 한국어", color: "#fbbf24", url: "https://vrew.voyagerx.com", isKorean: true }
+        ];
+        
+        // AI 에이전트/검색 서비스 데이터 (새로 추가)
+        const agentModels = [
+            { rank: 1, name: "Genspark", company: "Genspark", score: 93, price: "Free", usage: 89, specialty: "AI 검색 엔진", color: "#a78bfa", url: "https://genspark.ai", isKorean: false },
+            { rank: 2, name: "Perplexity Pro", company: "Perplexity", score: 92, price: "$$", usage: 91, specialty: "실시간 검색", color: "#00fff2", url: "https://perplexity.ai", isKorean: false },
+            { rank: 3, name: "Claude Code", company: "Anthropic", score: 90, price: "$$$", usage: 85, specialty: "코딩 에이전트", color: "#f472b6", url: "https://claude.ai/code", isKorean: false },
+            { rank: 4, name: "Wrtn Search", company: "Wrtn Technologies", score: 88, price: "Free", usage: 74, specialty: "한국어 AI 검색", color: "#10b981", url: "https://wrtn.ai", isKorean: true },
+            { rank: 5, name: "Gemini Advanced", company: "Google", score: 87, price: "$$$", usage: 88, specialty: "통합 어시스턴트", color: "#fb923c", url: "https://gemini.google.com/advanced", isKorean: false },
+            { rank: 6, name: "Microsoft Copilot", company: "Microsoft", score: 86, price: "$$", usage: 90, specialty: "생산성 도구", color: "#8b5cf6", url: "https://copilot.microsoft.com", isKorean: false },
+            { rank: 7, name: "Agent GPT", company: "Reworkd", score: 84, price: "$", usage: 76, specialty: "자율 에이전트", color: "#3b82f6", url: "https://agentgpt.reworkd.ai", isKorean: false },
+            { rank: 8, name: "AskUp", company: "AskUp", score: 82, price: "Free", usage: 82, specialty: "AI 어시스턴트", color: "#fbbf24", url: "https://askup.ai", isKorean: true }
+        ];
+        
+        // 국가별 데이터
         const countries = [
             { rank: 1, name: "미국", flag: "🇺🇸", aiPower: 39700, investment: 108.5, adoption: 28.3, models: 561, trend: "up" },
             { rank: 2, name: "중국", flag: "🇨🇳", aiPower: 400, investment: 63.3, adoption: 18.5, models: 342, trend: "up" },
@@ -95,13 +125,14 @@
             { rank: 10, name: "싱가포르", flag: "🇸🇬", aiPower: 1800, investment: 10.2, adoption: 60.9, models: 45, trend: "up" }
         ];
         
+        // 인사이트 데이터
         const insights = [
             { title: "멀티모달 통합 가속화", description: "2025년 AI 모델들은 텍스트, 이미지, 오디오, 비디오를 하나의 시스템에서 처리하는 방향으로 진화. GPT-4o, Gemini Ultra가 선도.", icon: "🔄", color: "border-cyan-400" },
             { title: "오픈소스의 부상", description: "DeepSeek V3, Llama 4 등 오픈소스 모델들이 상용 모델과 대등한 성능 달성. MIT 라이선스로 접근성 크게 향상.", icon: "🌐", color: "border-purple-400" },
             { title: "실시간 오디오-비디오 동기화", description: "Veo 3.1이 네이티브 오디오 생성으로 획기적 전환점. Wan 2.5는 원프롬프트 동기화 구현.", icon: "🎬", color: "border-pink-400" },
-            { title: "비용 효율성 개선", description: "AI 추론 비용이 2024년 대비 평균 40% 감소. Claude Haiku 4.5와 같은 경량 모델이 품질 타협 없이 저비용 실현.", icon: "💰", color: "border-orange-400" },
-            { title: "국가별 AI 격차 심화", description: "Global North와 South 간 AI 도입률 격차가 10.6%p로 확대. UAE, 한국이 빠른 성장세.", icon: "🌍", color: "border-blue-400" },
-            { title: "특화 모델 시대", description: "범용 모델보다 특정 작업에 최적화된 전문 모델 선호도 증가. 코딩, 이미지 편집, 비디오 생성 등 분야별 강자 출현.", icon: "🎯", color: "border-green-400" }
+            { title: "한국 AI 서비스 약진", description: "Clova Dubbing, Wrtn, Typecast 등 한국 AI 서비스들이 글로벌 톱10 진입. 특히 한국어 특화 분야에서 두각.", icon: "🇰🇷", color: "border-blue-400" },
+            { title: "AI 에이전트 시대 개막", description: "Genspark, Perplexity 등 AI 에이전트 서비스가 전통 검색엔진 대체. 자율 작업 수행 능력이 핵심 차별화 요소.", icon: "🤖", color: "border-green-400" },
+            { title: "음성 AI 품질 혁신", description: "ElevenLabs, OpenAI Voice Engine 등으로 TTS 품질이 인간과 구별 불가 수준 도달. 더빙 산업 재편.", icon: "🎙️", color: "border-orange-400" }
         ];
         
         function Dashboard() {
@@ -126,6 +157,8 @@
                     case 'llm': return llmModels;
                     case 'image': return imageModels;
                     case 'video': return videoModels;
+                    case 'voice': return voiceModels;
+                    case 'agent': return agentModels;
                     default: return llmModels;
                 }
             };
@@ -135,9 +168,14 @@
                     case 'llm': return 'LLM 모델';
                     case 'image': return '이미지 생성 모델';
                     case 'video': return '비디오 생성 모델';
+                    case 'voice': return '음성/TTS 모델';
+                    case 'agent': return 'AI 에이전트/검색';
                     default: return 'LLM 모델';
                 }
             };
+            
+            const totalModels = llmModels.length + imageModels.length + videoModels.length + voiceModels.length + agentModels.length;
+            const koreanServices = [...llmModels, ...imageModels, ...videoModels, ...voiceModels, ...agentModels].filter(m => m.isKorean).length;
             
             return (
                 <div className="min-h-screen">
@@ -155,7 +193,7 @@
                                 <div className="flex justify-center items-center gap-4 mb-6">
                                     <div className="update-indicator">
                                         <div className="update-dot"></div>
-                                        <span className="mono">STATIC</span>
+                                        <span className="mono">LIVE</span>
                                     </div>
                                     <span className="text-sm text-gray-400 mono">
                                         Data: Feb 2026
@@ -165,23 +203,23 @@
                                     Global AI Model<br/>Observatory 2026
                                 </h1>
                                 <p className="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
-                                    세계 최고의 AI 모델을 비교하고 추적하세요.<br/>
-                                    성능, 비용, 사용량, 국가별 AI 발전 현황을 한눈에.
+                                    세계 최고의 AI 모델과 서비스를 비교하고 추적하세요.<br/>
+                                    LLM, 이미지, 비디오, 음성, AI 에이전트까지 모두 한곳에서.
                                 </p>
                             </div>
                             
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-5xl mx-auto mb-16">
                                 <div className="glass-strong rounded-2xl p-6 text-center pulse-glow-animation">
-                                    <div className="text-4xl font-bold mono text-cyan-400">{llmModels.length + imageModels.length + videoModels.length}</div>
-                                    <div className="text-sm text-gray-400 mt-2">추적 모델</div>
+                                    <div className="text-4xl font-bold mono text-cyan-400">{totalModels}</div>
+                                    <div className="text-sm text-gray-400 mt-2">추적 모델/서비스</div>
                                 </div>
                                 <div className="glass-strong rounded-2xl p-6 text-center pulse-glow-animation" style={{ animationDelay: '0.5s' }}>
                                     <div className="text-4xl font-bold mono text-purple-400">{countries.length}</div>
                                     <div className="text-sm text-gray-400 mt-2">국가 순위</div>
                                 </div>
                                 <div className="glass-strong rounded-2xl p-6 text-center pulse-glow-animation" style={{ animationDelay: '1s' }}>
-                                    <div className="text-4xl font-bold mono text-pink-400">16.3%</div>
-                                    <div className="text-sm text-gray-400 mt-2">글로벌 AI 도입률</div>
+                                    <div className="text-4xl font-bold mono text-pink-400">{koreanServices}</div>
+                                    <div className="text-sm text-gray-400 mt-2">🇰🇷 한국 서비스</div>
                                 </div>
                                 <div className="glass-strong rounded-2xl p-6 text-center pulse-glow-animation" style={{ animationDelay: '1.5s' }}>
                                     <div className="text-4xl font-bold mono text-orange-400">₩6,720조</div>
@@ -195,13 +233,19 @@
                         <div className="glass rounded-3xl p-8 mb-16">
                             <div className="flex flex-wrap gap-4 mb-8 border-b border-white/10 pb-6">
                                 <button onClick={() => setActiveTab('llm')} className={`tab-button px-6 py-3 rounded-xl font-semibold transition-all ${activeTab === 'llm' ? 'active glass-strong' : 'text-gray-400 hover:text-white'}`}>
-                                    💬 LLM 모델
+                                    💬 LLM
                                 </button>
                                 <button onClick={() => setActiveTab('image')} className={`tab-button px-6 py-3 rounded-xl font-semibold transition-all ${activeTab === 'image' ? 'active glass-strong' : 'text-gray-400 hover:text-white'}`}>
-                                    🎨 이미지 생성
+                                    🎨 이미지
                                 </button>
                                 <button onClick={() => setActiveTab('video')} className={`tab-button px-6 py-3 rounded-xl font-semibold transition-all ${activeTab === 'video' ? 'active glass-strong' : 'text-gray-400 hover:text-white'}`}>
-                                    🎬 비디오 생성
+                                    🎬 비디오
+                                </button>
+                                <button onClick={() => setActiveTab('voice')} className={`tab-button px-6 py-3 rounded-xl font-semibold transition-all ${activeTab === 'voice' ? 'active glass-strong' : 'text-gray-400 hover:text-white'}`}>
+                                    🎙️ 음성/TTS
+                                </button>
+                                <button onClick={() => setActiveTab('agent')} className={`tab-button px-6 py-3 rounded-xl font-semibold transition-all ${activeTab === 'agent' ? 'active glass-strong' : 'text-gray-400 hover:text-white'}`}>
+                                    🤖 AI 에이전트
                                 </button>
                             </div>
                             
@@ -218,9 +262,10 @@
                                                     {model.rank}
                                                 </div>
                                                 <div>
-                                                    <h3 className="font-bold text-lg flex items-center gap-2">
+                                                    <h3 className="font-bold text-lg flex items-center gap-2 flex-wrap">
                                                         {model.name}
                                                         {model.rank <= 3 && <span className="badge badge-top">TOP</span>}
+                                                        {model.isKorean && <span className="badge badge-kr">🇰🇷 한국</span>}
                                                         {model.newFeatures && <span className="badge badge-new">NEW</span>}
                                                     </h3>
                                                     <p className="text-sm text-gray-400">{model.company}</p>
@@ -264,15 +309,18 @@
                                                 </div>
                                             )}
                                             
-                                            {model.newFeatures && (
-                                                <div className="flex flex-wrap gap-2 mt-3">
-                                                    {model.newFeatures.map(feature => (
-                                                        <span key={feature} className="text-xs px-3 py-1 rounded-full glass border border-white/20">
-                                                            {feature}
-                                                        </span>
-                                                    ))}
-                                                </div>
-                                            )}
+                                            <div className="flex flex-wrap gap-2 mt-3">
+                                                {model.newFeatures && model.newFeatures.map(feature => (
+                                                    <span key={feature} className="text-xs px-3 py-1 rounded-full glass border border-white/20">
+                                                        {feature}
+                                                    </span>
+                                                ))}
+                                                {model.url && (
+                                                    <a href={model.url} target="_blank" rel="noopener noreferrer" className="link-button">
+                                                        🔗 방문하기
+                                                    </a>
+                                                )}
+                                            </div>
                                         </div>
                                     </div>
                                 ))}
@@ -344,7 +392,7 @@
                             <div className="mt-12 text-center">
                                 <div className="inline-flex items-center gap-3 glass-strong rounded-full px-6 py-4">
                                     <div className="w-3 h-3 bg-green-400 rounded-full"></div>
-                                    <span className="text-sm font-semibold">Static Version - 백엔드 없이 작동 (GitHub Pages 호환)</span>
+                                    <span className="text-sm font-semibold">총 {koreanServices}개 한국 서비스 포함 • GitHub Pages 호환</span>
                                 </div>
                             </div>
                         </div>
@@ -354,10 +402,11 @@
                         <div className="glass rounded-2xl p-8">
                             <h3 className="text-2xl font-bold mb-4">데이터 소스</h3>
                             <p className="text-sm text-gray-400 leading-relaxed max-w-4xl mx-auto mb-4">
-                                Artificial Analysis, Arena AI (LMSYS), OpenRouter Rankings, Stanford HAI Global AI Vibrancy Tool
+                                Artificial Analysis, Arena AI (LMSYS), OpenRouter Rankings, Stanford HAI,<br/>
+                                ElevenLabs Benchmark, 각 서비스 공식 웹사이트
                             </p>
                             <div className="mt-6 mono text-xs text-gray-500">
-                                Built with React • GitHub Pages Compatible • Last updated: Feb 2026
+                                Built with React • 40+ AI Services Tracked • Last updated: Feb 2026
                             </div>
                         </div>
                     </div>
