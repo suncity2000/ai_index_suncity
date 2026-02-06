@@ -83,16 +83,16 @@
         ];
         
         const countries = [
-            { rank: 1, name: "미국", flag: "🇺🇸", aiPower: 39700, investment: 77.5, adoption: 28.3, models: 561, trend: "up" },
-            { rank: 2, name: "중국", flag: "🇨🇳", aiPower: 400, investment: 45.2, adoption: 18.5, models: 342, trend: "up" },
-            { rank: 3, name: "UAE", flag: "🇦🇪", aiPower: 3900, investment: 3.7, adoption: 64.0, models: 12, trend: "up" },
-            { rank: 4, name: "영국", flag: "🇬🇧", aiPower: 5200, investment: 28.3, adoption: 35.2, models: 156, trend: "stable" },
-            { rank: 5, name: "독일", flag: "🇩🇪", aiPower: 51, investment: 12.8, adoption: 31.5, models: 89, trend: "stable" },
-            { rank: 6, name: "한국", flag: "🇰🇷", aiPower: 5700, investment: 8.4, adoption: 42.1, models: 78, trend: "up" },
-            { rank: 7, name: "인도", flag: "🇮🇳", aiPower: 1200, investment: 11.1, adoption: 14.2, models: 124, trend: "up" },
-            { rank: 8, name: "프랑스", flag: "🇫🇷", aiPower: 2400, investment: 9.5, adoption: 44.0, models: 67, trend: "stable" },
-            { rank: 9, name: "일본", flag: "🇯🇵", aiPower: 890, investment: 5.9, adoption: 22.7, models: 103, trend: "stable" },
-            { rank: 10, name: "싱가포르", flag: "🇸🇬", aiPower: 1800, investment: 7.3, adoption: 60.9, models: 45, trend: "up" }
+            { rank: 1, name: "미국", flag: "🇺🇸", aiPower: 39700, investment: 108.5, adoption: 28.3, models: 561, trend: "up" },
+            { rank: 2, name: "중국", flag: "🇨🇳", aiPower: 400, investment: 63.3, adoption: 18.5, models: 342, trend: "up" },
+            { rank: 3, name: "UAE", flag: "🇦🇪", aiPower: 3900, investment: 5.2, adoption: 64.0, models: 12, trend: "up" },
+            { rank: 4, name: "영국", flag: "🇬🇧", aiPower: 5200, investment: 39.6, adoption: 35.2, models: 156, trend: "stable" },
+            { rank: 5, name: "독일", flag: "🇩🇪", aiPower: 51, investment: 17.9, adoption: 31.5, models: 89, trend: "stable" },
+            { rank: 6, name: "한국", flag: "🇰🇷", aiPower: 5700, investment: 11.8, adoption: 42.1, models: 78, trend: "up" },
+            { rank: 7, name: "인도", flag: "🇮🇳", aiPower: 1200, investment: 15.5, adoption: 14.2, models: 124, trend: "up" },
+            { rank: 8, name: "프랑스", flag: "🇫🇷", aiPower: 2400, investment: 13.3, adoption: 44.0, models: 67, trend: "stable" },
+            { rank: 9, name: "일본", flag: "🇯🇵", aiPower: 890, investment: 8.3, adoption: 22.7, models: 103, trend: "stable" },
+            { rank: 10, name: "싱가포르", flag: "🇸🇬", aiPower: 1800, investment: 10.2, adoption: 60.9, models: 45, trend: "up" }
         ];
         
         const insights = [
@@ -184,7 +184,7 @@
                                     <div className="text-sm text-gray-400 mt-2">글로벌 AI 도입률</div>
                                 </div>
                                 <div className="glass-strong rounded-2xl p-6 text-center pulse-glow-animation" style={{ animationDelay: '1.5s' }}>
-                                    <div className="text-4xl font-bold mono text-orange-400">$4.8T</div>
+                                    <div className="text-4xl font-bold mono text-orange-400">₩6,720조</div>
                                     <div className="text-sm text-gray-400 mt-2">2033 예상 시장규모</div>
                                 </div>
                             </div>
@@ -309,8 +309,8 @@
                                                 <div className="font-bold mono text-cyan-400">{country.aiPower.toLocaleString()}</div>
                                             </div>
                                             <div>
-                                                <div className="text-xs text-gray-400 mb-1">투자 ($B)</div>
-                                                <div className="font-bold mono text-purple-400">${country.investment}</div>
+                                                <div className="text-xs text-gray-400 mb-1">투자 (조원)</div>
+                                                <div className="font-bold mono text-purple-400">₩{country.investment}</div>
                                             </div>
                                             <div>
                                                 <div className="text-xs text-gray-400 mb-1">도입률</div>
