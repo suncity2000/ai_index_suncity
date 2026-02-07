@@ -27,7 +27,7 @@ jobs:
     
     - name: Run data scraper
       env:
-        AI_MODELS_KEY: ${{ secrets.AI_MODELS_KEY }} # 👈 비밀 키를 파이썬에 전달
+        AI_MODELS_KEY: aa_nlHXrHmYGAApxkFnjBrBFcYPegOsmqKZ
       run: |
         python scrape_data.py
     
