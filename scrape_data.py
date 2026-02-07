@@ -26,17 +26,26 @@ def fetch_api_data(endpoint):
         return []
 
 def map_model_data(items, category_type="llm"):
-    """API 원본 데이터를 대시보드 형식으로 매핑"""
     mapped_list = []
-    
-    # 한국 기업 리스트
-    korean_creators = ["Naver", "Wrtn", "Upstage", "Kakao", "Kuaishou"] # Kuaishou는 중국이나 예시용
+    korean_creators = ["Naver", "Wrtn", "Upstage", "Kakao"]
 
-    for index, item in enumerate(items[:15]): # 상위 15개만 사용
+    for index, item in enumerate(items[:15]):
         creator = item.get('model_creator', {})
         creator_name = creator.get('name', 'Unknown')
         
-        # 점수 산정 (LLM은 지능지수, 미디어는 ELO 점수 사용)
+        # [수정] 카테고리 데이터를 안전하게 가져오는 로직
+        categories = item.get('categories', [])
+        if category_type != "llm" and categories:
+            # 리스트가 비어있지 않을 때만 0번째 요소를 가져옵니다.
+            specialty = categories[0].get('style_category', 'General')
+        elif category_type != "llm":
+            # 리스트가 비어있다면 기본값을 설정합니다.
+            specialty = "General"
+        else:
+            # LLM은 specialty가 필요 없습니다.
+            specialty = ""
+
+        # 점수 산정 로직 (기존 유지)
         if category_type == "llm":
             score = item.get('evaluations', {}).get('artificial_analysis_intelligence_index', 0)
         else:
@@ -47,12 +56,12 @@ def map_model_data(items, category_type="llm"):
             "name": item.get('name'),
             "company": creator_name,
             "score": score,
-            "price": "$$$" if index < 5 else "$$", # 가격 데이터 미제공 시 등급별 임시 할당
+            "price": "$$$" if index < 5 else "$$",
             "usage": 98 - (index * 2),
             "color": "#00fff2" if index < 3 else "#a78bfa",
             "url": f"https://artificialanalysis.ai/models/{item.get('slug')}",
             "isKorean": creator_name in korean_creators,
-            "specialty": item.get('categories', [{}])[0].get('style_category', 'General') if category_type != "llm" else ""
+            "specialty": specialty # 안전하게 추출된 값 적용
         })
     return mapped_list
 
