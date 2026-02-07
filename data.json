@@ -1,5 +1,196 @@
 {
-  "llmModels": [],
+  "llmModels": [
+    {
+      "rank": 1,
+      "name": "Claude Opus 4.6 (Adaptive Reasoning)",
+      "company": "Anthropic",
+      "score": 53,
+      "price": "$$$$",
+      "usage": 98,
+      "color": "#00fff2",
+      "url": "https://artificialanalysis.ai/models/claude-opus-4-6-adaptive",
+      "isKorean": false,
+      "newFeatures": [
+        "API Live"
+      ]
+    },
+    {
+      "rank": 2,
+      "name": "GPT-5.2 (xhigh)",
+      "company": "OpenAI",
+      "score": 51.2,
+      "price": "$$$",
+      "usage": 96,
+      "color": "#00fff2",
+      "url": "https://artificialanalysis.ai/models/gpt-5-2",
+      "isKorean": false,
+      "newFeatures": [
+        "API Live"
+      ]
+    },
+    {
+      "rank": 3,
+      "name": "Claude Opus 4.5 (Reasoning)",
+      "company": "Anthropic",
+      "score": 49.7,
+      "price": "$$$$",
+      "usage": 94,
+      "color": "#00fff2",
+      "url": "https://artificialanalysis.ai/models/claude-opus-4-5-thinking",
+      "isKorean": false,
+      "newFeatures": [
+        "API Live"
+      ]
+    },
+    {
+      "rank": 4,
+      "name": "GPT-5.2 Codex (xhigh)",
+      "company": "OpenAI",
+      "score": 49,
+      "price": "$$$",
+      "usage": 92,
+      "color": "#a78bfa",
+      "url": "https://artificialanalysis.ai/models/gpt-5-2-codex",
+      "isKorean": false,
+      "newFeatures": [
+        "API Live"
+      ]
+    },
+    {
+      "rank": 5,
+      "name": "Gemini 3 Pro Preview (high)",
+      "company": "Google",
+      "score": 48.4,
+      "price": "$$$",
+      "usage": 90,
+      "color": "#a78bfa",
+      "url": "https://artificialanalysis.ai/models/gemini-3-pro",
+      "isKorean": false,
+      "newFeatures": [
+        "API Live"
+      ]
+    },
+    {
+      "rank": 6,
+      "name": "GPT-5.1 (high)",
+      "company": "OpenAI",
+      "score": 47.6,
+      "price": "$$$",
+      "usage": 88,
+      "color": "#a78bfa",
+      "url": "https://artificialanalysis.ai/models/gpt-5-1",
+      "isKorean": false,
+      "newFeatures": []
+    },
+    {
+      "rank": 7,
+      "name": "Kimi K2.5 (Reasoning)",
+      "company": "Kimi",
+      "score": 46.7,
+      "price": "$$",
+      "usage": 86,
+      "color": "#a78bfa",
+      "url": "https://artificialanalysis.ai/models/kimi-k2-5",
+      "isKorean": false,
+      "newFeatures": []
+    },
+    {
+      "rank": 8,
+      "name": "GPT-5.2 (medium)",
+      "company": "OpenAI",
+      "score": 46.6,
+      "price": "$$$",
+      "usage": 84,
+      "color": "#a78bfa",
+      "url": "https://artificialanalysis.ai/models/gpt-5-2-medium",
+      "isKorean": false,
+      "newFeatures": []
+    },
+    {
+      "rank": 9,
+      "name": "Gemini 3 Flash Preview (Reasoning)",
+      "company": "Google",
+      "score": 46.4,
+      "price": "$$",
+      "usage": 82,
+      "color": "#a78bfa",
+      "url": "https://artificialanalysis.ai/models/gemini-3-flash-reasoning",
+      "isKorean": false,
+      "newFeatures": []
+    },
+    {
+      "rank": 10,
+      "name": "Claude Opus 4.6 (Non-reasoning)",
+      "company": "Anthropic",
+      "score": 46.4,
+      "price": "$$$$",
+      "usage": 80,
+      "color": "#a78bfa",
+      "url": "https://artificialanalysis.ai/models/claude-opus-4-6",
+      "isKorean": false,
+      "newFeatures": []
+    },
+    {
+      "rank": 11,
+      "name": "GPT-5 (high)",
+      "company": "OpenAI",
+      "score": 44.6,
+      "price": "$$$",
+      "usage": 78,
+      "color": "#a78bfa",
+      "url": "https://artificialanalysis.ai/models/gpt-5",
+      "isKorean": false,
+      "newFeatures": []
+    },
+    {
+      "rank": 12,
+      "name": "GPT-5 Codex (high)",
+      "company": "OpenAI",
+      "score": 44.5,
+      "price": "$$$",
+      "usage": 76,
+      "color": "#a78bfa",
+      "url": "https://artificialanalysis.ai/models/gpt-5-codex",
+      "isKorean": false,
+      "newFeatures": []
+    },
+    {
+      "rank": 13,
+      "name": "Claude Opus 4.5 (Non-reasoning)",
+      "company": "Anthropic",
+      "score": 43,
+      "price": "$$$$",
+      "usage": 74,
+      "color": "#a78bfa",
+      "url": "https://artificialanalysis.ai/models/claude-opus-4-5",
+      "isKorean": false,
+      "newFeatures": []
+    },
+    {
+      "rank": 14,
+      "name": "Claude 4.5 Sonnet (Reasoning)",
+      "company": "Anthropic",
+      "score": 42.9,
+      "price": "$$$",
+      "usage": 72,
+      "color": "#a78bfa",
+      "url": "https://artificialanalysis.ai/models/claude-4-5-sonnet-thinking",
+      "isKorean": false,
+      "newFeatures": []
+    },
+    {
+      "rank": 15,
+      "name": "GPT-5.1 Codex (high)",
+      "company": "OpenAI",
+      "score": 42.2,
+      "price": "$$$",
+      "usage": 70,
+      "color": "#a78bfa",
+      "url": "https://artificialanalysis.ai/models/gpt-5-1-codex",
+      "isKorean": false,
+      "newFeatures": []
+    }
+  ],
   "imageModels": [
     {
       "rank": 1,
@@ -88,7 +279,7 @@
       "color": "border-blue-400"
     }
   ],
-  "lastUpdate": "2026-02-07T12:15:28.416377",
+  "lastUpdate": "2026-02-07T12:27:33.931337",
   "metadata": {
     "version": "1.0",
     "source": "Automated API"
