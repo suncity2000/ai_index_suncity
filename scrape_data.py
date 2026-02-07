@@ -20,8 +20,8 @@ def scrape_artificialanalysis():
     api_key = os.environ.get('AI_MODELS_KEY')
     
     # API 주소 (문서에 명시된 엔드포인트를 입력하세요)
-    url = "https://api.artificialanalysis.ai/v1/models" 
-    
+    url = " https://artificialanalysis.ai/api/v2/data/llms/models " 
+   
     headers = {
         "x-api-key": api_key,
         "Content-Type": "application/json"
