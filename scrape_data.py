@@ -10,34 +10,55 @@ from bs4 import BeautifulSoup
 from datetime import datetime
 import re
 
+import os  # 깃허브에 저장한 키를 가져오기 위해 필요해요
+from datetime import datetime
+
 def scrape_artificialanalysis():
-    """Artificial Analysis에서 LLM 데이터 스크래핑"""
-    print("📊 Artificial Analysis 스크래핑 중...")
+    print("📊 Artificial Analysis API에서 실제 데이터 수집 중...")
     
-    # 실제로는 API나 웹 스크래핑
-    # 여기서는 예시로 간단한 버전
+    # 1. 깃허브 Secrets에 저장한 API 키를 불러옵니다.
+    api_key = os.environ.get('AI_MODELS_KEY')
+    
+    # API 주소 (문서에 명시된 엔드포인트를 입력하세요)
+    url = "https://api.artificialanalysis.ai/v1/models" 
+    
+    headers = {
+        "x-api-key": api_key,
+        "Content-Type": "application/json"
+    }
     
     try:
-        # 예시: Artificial Analysis 페이지 접근
-        url = "https://artificialanalysis.ai/leaderboards/models"
-        headers = {'User-Agent': 'Mozilla/5.0'}
+        # 2. 실제 API 호출
+        response = requests.get(url, headers=headers, timeout=15)
         
-        response = requests.get(url, headers=headers, timeout=10)
-        soup = BeautifulSoup(response.text, 'html.parser')
-        
-        # 실제 스크래핑 로직은 사이트 구조에 따라 다름
-        # 여기서는 예시 데이터 반환
-        
-        #models = [
-          #  {"rank": 1, "name": "Claude Opus 4.5", "company": "Anthropic", "score": 89.4, "price": "$$$", "usage": 95, "color": "#00fff2", "url": "https://claude.ai", "isKorean": False, "newFeatures": ["Extended Context", "Vision"]},
-           # {"rank": 2, "name": "GPT-5", "company": "OpenAI", "score": 88.0, "price": "$$$$", "usage": 92, "color": "#a78bfa", "url": "https://openai.com/gpt-5", "isKorean": False, "newFeatures": ["Multimodal", "Long Context"]},
-        #]
-        
-        print(f"✅ LLM 모델 {len(models)}개 수집 완료")
-        return models
-        
+        if response.status_code == 200:
+            api_data = response.json()
+            
+            # 3. API 데이터를 우리 웹사이트(index.html) 형식에 맞게 변환
+            models = []
+            # API 응답 구조에 따라 반복문으로 데이터를 정리합니다.
+            for index, item in enumerate(api_data.get('models', [])[:10]): # 상위 10개만
+                models.append({
+                    "rank": index + 1,
+                    "name": item.get('name'),
+                    "company": item.get('creator_name'),
+                    "score": item.get('intelligence_score', 0), # 지능 점수
+                    "price": "$$$" if item.get('pricing_type') == 'usage' else "$",
+                    "usage": 90, # 임시값 (API 제공 여부에 따라 수정)
+                    "color": "#00fff2" if index == 0 else "#a78bfa",
+                    "url": f"https://artificialanalysis.ai/models/{item.get('slug')}",
+                    "isKorean": False,
+                    "newFeatures": ["API Real-time"]
+                })
+            
+            print(f"✅ 실제 모델 {len(models)}개 수집 성공!")
+            return models
+        else:
+            print(f"❌ API 오류 발생 (코드: {response.status_code})")
+            return []
+
     except Exception as e:
-        print(f"❌ 에러: {e}")
+        print(f"❌ 네트워크 에러: {e}")
         return []
 
 def scrape_lmsys_arena():
