@@ -1,36 +1,5 @@
 {
-  "llmModels": [
-    {
-      "rank": 1,
-      "name": "Claude Opus 4.5",
-      "company": "Anthropic",
-      "score": 89.4,
-      "price": "$$$",
-      "usage": 95,
-      "color": "#00fff2",
-      "url": "https://claude.ai",
-      "isKorean": false,
-      "newFeatures": [
-        "Extended Context",
-        "Vision"
-      ]
-    },
-    {
-      "rank": 2,
-      "name": "GPT-5",
-      "company": "OpenAI",
-      "score": 88.0,
-      "price": "$$$$",
-      "usage": 92,
-      "color": "#a78bfa",
-      "url": "https://openai.com/gpt-5",
-      "isKorean": false,
-      "newFeatures": [
-        "Multimodal",
-        "Long Context"
-      ]
-    }
-  ],
+  "llmModels": [],
   "imageModels": [
     {
       "rank": 1,
@@ -157,7 +126,7 @@
       "color": "border-blue-400"
     }
   ],
-  "lastUpdate": "2026-02-07T09:32:05.063132",
+  "lastUpdate": "2026-02-07T10:09:37.483866",
   "metadata": {
     "version": "1.0",
     "source": "Automated scraping",
