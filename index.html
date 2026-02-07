@@ -56,15 +56,13 @@
     <script type="text/babel">
         const { useState, useEffect } = React;
         
-        // 🔥 핵심: data.json 파일에서 데이터 자동 로드!
         function Dashboard() {
             const [activeTab, setActiveTab] = useState('llm');
             const [loading, setLoading] = useState(true);
-            const [dataSource, setDataSource] = useState('로딩 중...');
             const [lastUpdate, setLastUpdate] = useState(null);
             const [scrollProgress, setScrollProgress] = useState(0);
             
-            // 데이터 상태
+            // 🔥 data.json에서 불러올 데이터 상태
             const [llmModels, setLlmModels] = useState([]);
             const [imageModels, setImageModels] = useState([]);
             const [videoModels, setVideoModels] = useState([]);
@@ -73,18 +71,11 @@
             const [countries, setCountries] = useState([]);
             const [insights, setInsights] = useState([]);
             
-            // 🚀 페이지 로드 시 data.json에서 데이터 자동 로드!
+            // 🚀 페이지 로드 시 data.json에서 데이터 불러오기
             useEffect(() => {
-                loadData();
-            }, []);
-            
-            const loadData = async () => {
-                setLoading(true);
-                try {
-                    // data.json 파일 로드 (캐시 방지)
-                    const response = await fetch('./data.json?t=' + Date.now());
-                    
-                    if (response.ok) {
+                const loadData = async () => {
+                    try {
+                        const response = await fetch('./data.json?t=' + Date.now()); // 캐시 방지
                         const data = await response.json();
                         
                         // 데이터 적용
@@ -97,18 +88,16 @@
                         setInsights(data.insights || []);
                         setLastUpdate(data.lastUpdate ? new Date(data.lastUpdate) : new Date());
                         
-                        setDataSource('GitHub Actions 자동 수집');
+                        setLoading(false);
                         console.log('✅ data.json 로드 성공!');
-                    } else {
-                        throw new Error('data.json 파일을 찾을 수 없습니다');
+                    } catch (error) {
+                        console.error('❌ data.json 로드 실패:', error);
+                        setLoading(false);
                     }
-                } catch (error) {
-                    console.warn('⚠️ data.json 로드 실패, 기본 데이터 사용:', error);
-                    setDataSource('기본 데이터 (data.json 없음)');
-                    // 기본 데이터는 생략 (간결성을 위해)
-                }
-                setLoading(false);
-            };
+                };
+                
+                loadData();
+            }, []);
             
             // 스크롤 진행률
             useEffect(() => {
@@ -175,7 +164,7 @@
                                 <div className="flex justify-center items-center gap-4 mb-6">
                                     <div className="update-indicator">
                                         <div className="update-dot"></div>
-                                        <span className="mono">AUTO UPDATE</span>
+                                        <span className="mono">AUTO</span>
                                     </div>
                                     {lastUpdate && (
                                         <span className="text-sm text-gray-400 mono">
@@ -187,8 +176,8 @@
                                     Global AI Model<br/>Observatory 2026
                                 </h1>
                                 <p className="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
-                                    매일 자동으로 업데이트되는 최신 AI 모델 정보<br/>
-                                    GitHub Actions가 실제 데이터를 수집합니다
+                                    세계 최고의 AI 모델과 서비스를 비교하고 추적하세요.<br/>
+                                    LLM, 이미지, 비디오, 음성, AI 에이전트까지 모두 한곳에서.
                                 </p>
                             </div>
                             
@@ -213,16 +202,184 @@
                         </div>
                     </div>
                     
+                    <div className="container mx-auto px-6 py-16">
+                        <div className="glass rounded-3xl p-8 mb-16">
+                            <div className="flex flex-wrap gap-4 mb-8 border-b border-white/10 pb-6">
+                                <button onClick={() => setActiveTab('llm')} className={`tab-button px-6 py-3 rounded-xl font-semibold transition-all ${activeTab === 'llm' ? 'active glass-strong' : 'text-gray-400 hover:text-white'}`}>
+                                    💬 LLM
+                                </button>
+                                <button onClick={() => setActiveTab('image')} className={`tab-button px-6 py-3 rounded-xl font-semibold transition-all ${activeTab === 'image' ? 'active glass-strong' : 'text-gray-400 hover:text-white'}`}>
+                                    🎨 이미지
+                                </button>
+                                <button onClick={() => setActiveTab('video')} className={`tab-button px-6 py-3 rounded-xl font-semibold transition-all ${activeTab === 'video' ? 'active glass-strong' : 'text-gray-400 hover:text-white'}`}>
+                                    🎬 비디오
+                                </button>
+                                <button onClick={() => setActiveTab('voice')} className={`tab-button px-6 py-3 rounded-xl font-semibold transition-all ${activeTab === 'voice' ? 'active glass-strong' : 'text-gray-400 hover:text-white'}`}>
+                                    🎙️ 음성/TTS
+                                </button>
+                                <button onClick={() => setActiveTab('agent')} className={`tab-button px-6 py-3 rounded-xl font-semibold transition-all ${activeTab === 'agent' ? 'active glass-strong' : 'text-gray-400 hover:text-white'}`}>
+                                    🤖 AI 에이전트
+                                </button>
+                            </div>
+                            
+                            <h2 className="section-title text-4xl mb-8">
+                                {getTitle()} 성능 순위
+                            </h2>
+                            
+                            <div className="grid md:grid-cols-2 gap-6">
+                                {getModels().map((model) => (
+                                    <div key={model.rank} className="model-card glass-strong rounded-2xl p-6">
+                                        <div className="flex items-start justify-between mb-4">
+                                            <div className="flex items-center gap-3">
+                                                <div className="rank-badge w-10 h-10 rounded-xl flex items-center justify-center font-bold mono">
+                                                    {model.rank}
+                                                </div>
+                                                <div>
+                                                    <h3 className="font-bold text-lg flex items-center gap-2 flex-wrap">
+                                                        {model.name}
+                                                        {model.rank <= 3 && <span className="badge badge-top">TOP</span>}
+                                                        {model.isKorean && <span className="badge badge-kr">🇰🇷 한국</span>}
+                                                        {model.newFeatures && <span className="badge badge-new">NEW</span>}
+                                                    </h3>
+                                                    <p className="text-sm text-gray-400">{model.company}</p>
+                                                </div>
+                                            </div>
+                                            <div className="price-tag mono">{model.price}</div>
+                                        </div>
+                                        
+                                        <div className="space-y-3">
+                                            <div>
+                                                <div className="flex justify-between text-sm mb-2">
+                                                    <span className="text-gray-400">성능 점수</span>
+                                                    <span className="font-bold mono" style={{ color: model.color }}>{model.score}</span>
+                                                </div>
+                                                <div className="stat-bar">
+                                                    <div className="stat-fill" style={{ width: `${model.score}%`, background: `linear-gradient(90deg, ${model.color}, ${model.color}88)` }}></div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div>
+                                                <div className="flex justify-between text-sm mb-2">
+                                                    <span className="text-gray-400">사용률</span>
+                                                    <span className="font-bold mono">{model.usage}%</span>
+                                                </div>
+                                                <div className="stat-bar">
+                                                    <div className="stat-fill" style={{ width: `${model.usage}%` }}></div>
+                                                </div>
+                                            </div>
+                                            
+                                            {model.specialty && (
+                                                <div className="flex items-center gap-2 text-sm">
+                                                    <span className="text-gray-400">특화:</span>
+                                                    <span className="font-semibold" style={{ color: model.color }}>{model.specialty}</span>
+                                                </div>
+                                            )}
+                                            
+                                            {model.duration && (
+                                                <div className="flex items-center gap-2 text-sm">
+                                                    <span className="text-gray-400">길이:</span>
+                                                    <span className="font-semibold" style={{ color: model.color }}>{model.duration}</span>
+                                                </div>
+                                            )}
+                                            
+                                            <div className="flex flex-wrap gap-2 mt-3">
+                                                {model.newFeatures && model.newFeatures.map(feature => (
+                                                    <span key={feature} className="text-xs px-3 py-1 rounded-full glass border border-white/20">
+                                                        {feature}
+                                                    </span>
+                                                ))}
+                                                {model.url && (
+                                                    <a href={model.url} target="_blank" rel="noopener noreferrer" className="link-button">
+                                                        🔗 방문하기
+                                                    </a>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                        
+                        <div className="glass rounded-3xl p-8 mb-16">
+                            <h2 className="section-title text-4xl mb-8">
+                                🌍 국가별 AI 역량 순위
+                            </h2>
+                            
+                            <div className="grid md:grid-cols-2 gap-6">
+                                {countries.map((country) => (
+                                    <div key={country.rank} className="glass-strong rounded-2xl p-6 hover:scale-105 transition-transform">
+                                        <div className="flex items-center justify-between mb-4">
+                                            <div className="flex items-center gap-4">
+                                                <div className="rank-badge w-10 h-10 rounded-xl flex items-center justify-center font-bold mono text-sm">
+                                                    {country.rank}
+                                                </div>
+                                                <div className="text-3xl">{country.flag}</div>
+                                                <div>
+                                                    <h3 className="font-bold text-lg">{country.name}</h3>
+                                                    <p className="text-sm text-gray-400 mono">{country.models} 모델</p>
+                                                </div>
+                                            </div>
+                                            <div className={`text-2xl ${country.trend === 'up' ? 'text-cyan-400' : 'text-gray-400'}`}>
+                                                {country.trend === 'up' ? '↗' : '→'}
+                                            </div>
+                                        </div>
+                                        
+                                        <div className="grid grid-cols-3 gap-4 text-center">
+                                            <div>
+                                                <div className="text-xs text-gray-400 mb-1">AI 파워</div>
+                                                <div className="font-bold mono text-cyan-400">{country.aiPower.toLocaleString()}</div>
+                                            </div>
+                                            <div>
+                                                <div className="text-xs text-gray-400 mb-1">투자 (조원)</div>
+                                                <div className="font-bold mono text-purple-400">₩{country.investment}</div>
+                                            </div>
+                                            <div>
+                                                <div className="text-xs text-gray-400 mb-1">도입률</div>
+                                                <div className="font-bold mono text-pink-400">{country.adoption}%</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                        
+                        <div className="glass rounded-3xl p-8">
+                            <h2 className="section-title text-4xl mb-8">
+                                💡 2025-2026 AI 발전 인사이트
+                            </h2>
+                            
+                            <div className="grid md:grid-cols-2 gap-6">
+                                {insights.map((insight, index) => (
+                                    <div key={index} className={`glass-strong rounded-2xl p-6 border-l-4 ${insight.color}`}>
+                                        <div className="flex items-start gap-4">
+                                            <div className="text-4xl">{insight.icon}</div>
+                                            <div>
+                                                <h3 className="font-bold text-lg mb-2">{insight.title}</h3>
+                                                <p className="text-sm text-gray-300 leading-relaxed">{insight.description}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                            
+                            <div className="mt-12 text-center">
+                                <div className="inline-flex items-center gap-3 glass-strong rounded-full px-6 py-4">
+                                    <div className="w-3 h-3 bg-green-400 rounded-full"></div>
+                                    <span className="text-sm font-semibold">data.json에서 자동 로드 • 총 {koreanServices}개 한국 서비스 포함</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <div className="container mx-auto px-6 py-12 text-center">
                         <div className="glass rounded-2xl p-8">
-                            <h3 className="text-2xl font-bold mb-4">🤖 자동 업데이트 시스템</h3>
+                            <h3 className="text-2xl font-bold mb-4">데이터 소스</h3>
                             <p className="text-sm text-gray-400 leading-relaxed max-w-4xl mx-auto mb-4">
-                                매일 자동으로 GitHub Actions가 실행되어<br/>
-                                Artificial Analysis, Arena AI, OpenRouter 등에서 최신 데이터를 수집합니다<br/>
-                                🔄 버튼을 눌러 언제든지 새로고침할 수 있습니다
+                                Artificial Analysis, Arena AI (LMSYS), OpenRouter Rankings, Stanford HAI,<br/>
+                                ElevenLabs Benchmark, 각 서비스 공식 웹사이트
                             </p>
                             <div className="mt-6 mono text-xs text-gray-500">
-                                Data Source: {dataSource} • Last updated: {lastUpdate?.toLocaleString('ko-KR')}
+                                Built with React • data.json 자동 로드 • Last updated: {lastUpdate?.toLocaleString('ko-KR')}
                             </div>
                         </div>
                     </div>
