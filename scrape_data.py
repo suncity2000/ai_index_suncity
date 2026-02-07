@@ -22,8 +22,8 @@ def scrape_artificialanalysis():
         url = "https://artificialanalysis.ai/leaderboards/models"
         headers = {'User-Agent': 'Mozilla/5.0'}
         
-        # response = requests.get(url, headers=headers, timeout=10)
-        # soup = BeautifulSoup(response.text, 'html.parser')
+        response = requests.get(url, headers=headers, timeout=10)
+        soup = BeautifulSoup(response.text, 'html.parser')
         
         # 실제 스크래핑 로직은 사이트 구조에 따라 다름
         # 여기서는 예시 데이터 반환
