@@ -24,6 +24,8 @@ jobs:
         pip install requests beautifulsoup4 lxml
     
     - name: Run data scraper
+      env:
+        AI_MODELS_KEY: ${{ secrets.AI_MODELS_KEY }} # 이 줄을 추가해야 파이썬이 키를 읽을 수 있어요!
       run: |
         python scrape_data.py
     
