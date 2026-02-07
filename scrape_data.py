@@ -7,7 +7,7 @@ from datetime import datetime
 def scrape_artificialanalysis():
     print("📊 Artificial Analysis API에서 실제 데이터 수집 및 매핑 중...")
     
-    api_key = aa_nlHXrHmYGAApxkFnjBrBFcYPegOsmqKZ
+    api_key = "aa_nlHXrHmYGAApxkFnjBrBFcYPegOsmqKZ"
     if not api_key:
         print("❌ API 키를 찾을 수 없습니다.")
         return []
