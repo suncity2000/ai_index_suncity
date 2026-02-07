@@ -13,54 +13,66 @@ import re
 import os  # 깃허브에 저장한 키를 가져오기 위해 필요해요
 from datetime import datetime
 
+import json
+import requests
+import os
+from datetime import datetime
+
 def scrape_artificialanalysis():
     print("📊 Artificial Analysis API에서 실제 데이터 수집 중...")
     
-    # 1. 깃허브 Secrets에 저장한 API 키를 불러옵니다.
-    #api_key = os.environ.get('AI_MODELS_KEY')
-    api_key = "aa_nlHXrHmYGAApxkFnjBrBFcYPegOsmqKZ"
-    # API 주소 (문서에 명시된 엔드포인트를 입력하세요)
+    # [수정] 깃허브 Secrets에서 키를 가져옵니다. (보안)
+    api_key = os.environ.get('AI_MODELS_KEY')
+    
+    # 만약 로컬 테스트 중이라면 아래 주석을 풀고 키를 넣으세요. (단, 깃허브엔 올리지 마세요!)
+    # api_key = "여기에_키_입력" 
+
+    if not api_key:
+        print("❌ API 키를 찾을 수 없습니다. GitHub Secrets 설정을 확인하세요.")
+        return []
+
     url = "https://artificialanalysis.ai/api/v2/data/llms/models" 
-    response = requests.get(url, headers={"x-api-key": api_key})
-    print(response.json()) # 이 줄이 핵심입니다!
     headers = {
         "x-api-key": api_key,
         "Content-Type": "application/json"
     }
     
     try:
-        # 2. 실제 API 호출
         response = requests.get(url, headers=headers, timeout=15)
-        
+        print(response.json()) # 이 줄이 핵심입니다!
         if response.status_code == 200:
             api_data = response.json()
             
-            # 3. API 데이터를 우리 웹사이트(index.html) 형식에 맞게 변환
+            # [수정] API 응답이 리스트인 경우를 대비한 안전한 처리
+            raw_models = api_data if isinstance(api_data, list) else api_data.get('models', [])
+            
             models = []
-            # API 응답 구조에 따라 반복문으로 데이터를 정리합니다.
-            for index, item in enumerate(api_data.get('models', [])[:10]): # 상위 10개만
+            for index, item in enumerate(raw_models[:15]): # 상위 15개 수집
+                # API 필드명을 문서(v2)에 맞춰 매핑
                 models.append({
                     "rank": index + 1,
-                    "name": item.get('name'),
-                    "company": item.get('creator_name'),
-                    "score": item.get('intelligence_score', 0), # 지능 점수
-                    "price": "$$$" if item.get('pricing_type') == 'usage' else "$",
-                    "usage": 90, # 임시값 (API 제공 여부에 따라 수정)
-                    "color": "#00fff2" if index == 0 else "#a78bfa",
-                    "url": f"https://artificialanalysis.ai/models/{item.get('slug')}",
+                    "name": item.get('model_name') or item.get('name'),
+                    "company": item.get('creator_name') or "AI Research",
+                    "score": item.get('intelligence_index') or item.get('intelligence_score', 85),
+                    "price": "$$$" if (item.get('price_per_1m_tokens', 0) > 10) else "$$",
+                    "usage": 90 - index, # 순위에 따른 가상 사용률
+                    "color": "#00fff2" if index < 3 else "#a78bfa", # TOP 3는 다른 색상
+                    "url": f"https://artificialanalysis.ai/models/{item.get('model_slug') or item.get('slug')}",
                     "isKorean": False,
-                    "newFeatures": ["API Real-time"]
+                    "newFeatures": ["Verified API"]
                 })
             
             print(f"✅ 실제 모델 {len(models)}개 수집 성공!")
             return models
         else:
-            print(f"❌ API 오류 발생 (코드: {response.status_code})")
+            print(f"❌ API 오류 (상태 코드: {response.status_code})")
             return []
 
     except Exception as e:
-        print(f"❌ 네트워크 에러: {e}")
+        print(f"❌ 데이터 처리 중 에러 발생: {e}")
         return []
+
+# ... (이하 main 함수 등은 동일)
 
 def scrape_lmsys_arena():
     """LMSYS Arena에서 이미지/비디오 모델 데이터 스크래핑"""
