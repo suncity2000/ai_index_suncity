@@ -2,11 +2,12 @@ name: Update AI Model Data
 
 on:
   schedule:
-    # 매일 오전 9시 (UTC 0시)에 실행
-    - cron: '0 0 * * *'
-  workflow_dispatch: # 수동 실행도 가능
+    - cron: '0 0 * * *' # 매일 정오(UTC)
+  workflow_dispatch: # 수동 실행 버튼 활성화
+
 permissions:
-  contents: write
+  contents: write # 👈 파일 수정을 위해 반드시 필요합니다!
+
 jobs:
   update-data:
     runs-on: ubuntu-latest
@@ -22,17 +23,17 @@ jobs:
     
     - name: Install dependencies
       run: |
-        pip install requests beautifulsoup4 lxml
+        pip install requests beautifulsoup4 # 필요한 라이브러리 설치
     
     - name: Run data scraper
       env:
-        AI_MODELS_KEY: ${{ secrets.AI_MODELS_KEY }} # 이 줄을 추가해야 파이썬이 키를 읽을 수 있어요!
+        AI_MODELS_KEY: ${{ secrets.AI_MODELS_KEY }} # 👈 비밀 키를 파이썬에 전달
       run: |
         python scrape_data.py
     
     - name: Commit and push if changed
       run: |
-        git config --global user.name 'GitHub Actions Bot'
-        git config --global user.email 'actions@github.com'
+        git config --global user.name 'github-actions[bot]'
+        git config --global user.email 'github-actions[bot]@users.noreply.github.com'
         git add data.json
         git diff --quiet && git diff --staged --quiet || (git commit -m "🤖 Auto-update AI model data" && git push)
