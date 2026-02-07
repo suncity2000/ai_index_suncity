@@ -28,10 +28,10 @@ def scrape_artificialanalysis():
         # 실제 스크래핑 로직은 사이트 구조에 따라 다름
         # 여기서는 예시 데이터 반환
         
-        models = [
-            {"rank": 1, "name": "Claude Opus 4.5", "company": "Anthropic", "score": 89.4, "price": "$$$", "usage": 95, "color": "#00fff2", "url": "https://claude.ai", "isKorean": False, "newFeatures": ["Extended Context", "Vision"]},
-            {"rank": 2, "name": "GPT-5", "company": "OpenAI", "score": 88.0, "price": "$$$$", "usage": 92, "color": "#a78bfa", "url": "https://openai.com/gpt-5", "isKorean": False, "newFeatures": ["Multimodal", "Long Context"]},
-        ]
+        #models = [
+          #  {"rank": 1, "name": "Claude Opus 4.5", "company": "Anthropic", "score": 89.4, "price": "$$$", "usage": 95, "color": "#00fff2", "url": "https://claude.ai", "isKorean": False, "newFeatures": ["Extended Context", "Vision"]},
+           # {"rank": 2, "name": "GPT-5", "company": "OpenAI", "score": 88.0, "price": "$$$$", "usage": 92, "color": "#a78bfa", "url": "https://openai.com/gpt-5", "isKorean": False, "newFeatures": ["Multimodal", "Long Context"]},
+        #]
         
         print(f"✅ LLM 모델 {len(models)}개 수집 완료")
         return models
