@@ -17,11 +17,12 @@ def scrape_artificialanalysis():
     print("📊 Artificial Analysis API에서 실제 데이터 수집 중...")
     
     # 1. 깃허브 Secrets에 저장한 API 키를 불러옵니다.
-    api_key = os.environ.get('AI_MODELS_KEY')
-    
+    #api_key = os.environ.get('AI_MODELS_KEY')
+    api_key = "aa_nlHXrHmYGAApxkFnjBrBFcYPegOsmqKZ"
     # API 주소 (문서에 명시된 엔드포인트를 입력하세요)
-    url = " https://artificialanalysis.ai/api/v2/data/llms/models " 
-   
+    url = "https://artificialanalysis.ai/api/v2/data/llms/models" 
+    response = requests.get(url, headers={"x-api-key": api_key})
+    print(response.json()) # 이 줄이 핵심입니다!
     headers = {
         "x-api-key": api_key,
         "Content-Type": "application/json"
