@@ -22,9 +22,9 @@
       "score": 94,
       "price": "$$$",
       "usage": 88,
-      "duration": "8s with audio",
+      "duration": "8s",
       "color": "#f472b6",
-      "url": "https://deepmind.google/technologies/veo/",
+      "url": "https://deepmind.google/veo/",
       "isKorean": false
     }
   ],
@@ -66,41 +66,9 @@
       "color": "#a78bfa",
       "url": "https://genspark.ai",
       "isKorean": false
-    },
-    {
-      "rank": 4,
-      "name": "Wrtn Search",
-      "company": "Wrtn Technologies",
-      "score": 88,
-      "price": "Free",
-      "usage": 74,
-      "specialty": "한국어 AI 검색",
-      "color": "#10b981",
-      "url": "https://wrtn.ai",
-      "isKorean": true
     }
   ],
   "countries": [
-    {
-      "rank": 1,
-      "name": "미국",
-      "flag": "🇺🇸",
-      "aiPower": 39700,
-      "investment": 108.5,
-      "adoption": 28.3,
-      "models": 561,
-      "trend": "up"
-    },
-    {
-      "rank": 2,
-      "name": "중국",
-      "flag": "🇨🇳",
-      "aiPower": 400,
-      "investment": 63.3,
-      "adoption": 18.5,
-      "models": 342,
-      "trend": "up"
-    },
     {
       "rank": 6,
       "name": "한국",
@@ -114,22 +82,15 @@
   ],
   "insights": [
     {
-      "title": "멀티모달 통합 가속화",
-      "description": "2025년 AI 모델들은 텍스트, 이미지, 오디오, 비디오를 하나의 시스템에서 처리하는 방향으로 진화.",
-      "icon": "🔄",
-      "color": "border-cyan-400"
-    },
-    {
       "title": "한국 AI 서비스 약진",
-      "description": "Clova Dubbing, Wrtn, Typecast 등 한국 AI 서비스들이 글로벌 톱10 진입.",
+      "description": "국내 서비스들이 글로벌 톱10 진입 중.",
       "icon": "🇰🇷",
       "color": "border-blue-400"
     }
   ],
-  "lastUpdate": "2026-02-07T10:52:05.563303",
+  "lastUpdate": "2026-02-07T11:00:40.024661",
   "metadata": {
     "version": "1.0",
-    "source": "Automated scraping",
-    "nextUpdate": "Next update in 24 hours"
+    "source": "Automated API"
   }
 }
