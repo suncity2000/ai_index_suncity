@@ -186,7 +186,7 @@
       "rank": 1,
       "name": "Riverflow 2.0",
       "company": "Sourceful",
-      "score": 1252,
+      "score": 1254,
       "price": "$$$",
       "usage": 98,
       "color": "#00fff2",
@@ -198,7 +198,7 @@
       "rank": 2,
       "name": "GPT Image 1.5 (high)",
       "company": "OpenAI",
-      "score": 1241,
+      "score": 1242,
       "price": "$$$",
       "usage": 96,
       "color": "#00fff2",
@@ -392,7 +392,7 @@
       "rank": 3,
       "name": "Runway Gen-4.5",
       "company": "Runway",
-      "score": 1236,
+      "score": 1237,
       "price": "$$$",
       "usage": 94,
       "color": "#00fff2",
@@ -416,7 +416,7 @@
       "rank": 5,
       "name": "Kling 2.5 Turbo 1080p",
       "company": "KlingAI",
-      "score": 1227,
+      "score": 1228,
       "price": "$$$",
       "usage": 90,
       "color": "#a78bfa",
@@ -476,7 +476,7 @@
       "rank": 10,
       "name": "Kling O1 Pro (January)",
       "company": "KlingAI",
-      "score": 1212,
+      "score": 1211,
       "price": "$$",
       "usage": 80,
       "color": "#a78bfa",
@@ -773,7 +773,7 @@
       "color": "border-blue-400"
     }
   ],
-  "lastUpdate": "2026-02-09T01:06:18.954310",
+  "lastUpdate": "2026-02-09T09:26:45.565644",
   "metadata": {
     "version": "2.0",
     "source": "Artificial Analysis API v2"
