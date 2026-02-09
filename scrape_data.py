@@ -6,9 +6,7 @@ from datetime import datetime
 
 # 공통 설정
 API_BASE_URL = "https://artificialanalysis.ai/api/v2/data"
-# [주의] 깃허브에 올릴 때는 보안을 위해 아래 줄을 사용하세요.
-# API_KEY = os.environ.get('AI_MODELS_KEY')
-API_KEY = "aa_nlHXrHmYGAApxkFnjBrBFcYPegOsmqKZ" # 현재 직접 넣어 해결하셨으므로 유지
+API_KEY = os.environ.get('AI_MODELS_KEY')
 
 def fetch_api_data(endpoint):
     """API 엔드포인트에서 데이터를 가져오는 공통 함수"""

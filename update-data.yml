@@ -27,7 +27,7 @@ jobs:
     
     - name: Run data scraper
       env:
-        AI_MODELS_KEY: aa_nlHXrHmYGAApxkFnjBrBFcYPegOsmqKZ
+        AI_MODELS_KEY: ${{ secrets.AI_MODELS_KEY }}
       run: |
         python scrape_data.py
     
